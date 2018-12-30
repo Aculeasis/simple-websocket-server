@@ -9,8 +9,8 @@
 
   function init()
   {
-	document.myform.url.value = "ws://localhost:8000/"
-	document.myform.inputtext.value = "Hello World!"
+	document.myform.url.value = "ws://localhost:8999/"
+	document.myform.inputtext.value = "remote_log:raw"
 	document.myform.disconnectButton.disabled = true;
   }
 
@@ -39,7 +39,7 @@
 
   function onMessage(evt)
   {
-    writeToScreen("response: " + evt.data + '\n');
+    writeToScreen(evt.data + '\n');
   }
 
   function onError(evt)
