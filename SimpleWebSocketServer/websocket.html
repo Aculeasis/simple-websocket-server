@@ -10,7 +10,6 @@
   function init()
   {
 	document.myform.url.value = "ws://localhost:8999/"
-	document.myform.inputtext.value = "remote_log:raw"
 	document.myform.disconnectButton.disabled = true;
   }
 
@@ -28,6 +27,7 @@
     writeToScreen("connected\n");
 	document.myform.connectButton.disabled = true;
 	document.myform.disconnectButton.disabled = false;
+    websocket.send("remote_log:raw");
   }
 
   function onClose(evt)
@@ -51,12 +51,6 @@
 	document.myform.connectButton.disabled = false;
 	document.myform.disconnectButton.disabled = true;
 
-  }
-
-  function doSend(message)
-  {
-    writeToScreen("sent: " + message + '\n'); 
-    websocket.send(message);
   }
 
   function writeToScreen(message)
@@ -88,16 +82,12 @@
 
 <form name="myform">
 <p>
-<textarea name="outputtext" rows="20" cols="50"></textarea>
+<textarea name="outputtext" rows="50" cols="120"></textarea>
 </p>
 <p>
-<textarea name="inputtext" cols="50"></textarea>
+<input type="text" name="url" size="40"></input>
 </p>
 <p>
-<textarea name="url" cols="50"></textarea>
-</p>
-<p>
-<input type="button" name=sendButton value="Send" onClick="sendText();">
 <input type="button" name=clearButton value="Clear" onClick="clearText();">
 <input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
 <input type="button" name=connectButton value="Connect" onClick="doConnect();">
