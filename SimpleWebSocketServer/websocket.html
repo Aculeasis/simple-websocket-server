@@ -10,6 +10,7 @@
   function init()
   {
 	document.myform.url.value = "ws://localhost:8999/"
+	document.myform.ws_token.value = "token_is_unset"
 	document.myform.disconnectButton.disabled = true;
   }
 
@@ -27,12 +28,13 @@
     writeToScreen("connected\n");
 	document.myform.connectButton.disabled = true;
 	document.myform.disconnectButton.disabled = false;
-    websocket.send("remote_log:raw");
+	websocket.send(document.myform.ws_token.value);
+	websocket.send("remote_log:raw");
   }
 
   function onClose(evt)
   {
-    writeToScreen("disconnected\n");
+	writeToScreen("disconnected\n");
 	document.myform.connectButton.disabled = false;
 	document.myform.disconnectButton.disabled = true;
   }
@@ -44,7 +46,7 @@
 
   function onError(evt)
   {
-    writeToScreen('error: ' + evt.data + '\n');
+	writeToScreen('error: ' + evt.data + '\n');
 
 	websocket.close();
 
@@ -55,7 +57,7 @@
 
   function writeToScreen(message)
   {
-    document.myform.outputtext.value += message
+	document.myform.outputtext.value += message
 	document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
 
   }
@@ -83,6 +85,9 @@
 <form name="myform">
 <p>
 <textarea name="outputtext" rows="50" cols="120"></textarea>
+</p>
+<p>
+<input type="text" name="ws_token" size="40"></input>
 </p>
 <p>
 <input type="text" name="url" size="40"></input>
