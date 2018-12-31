@@ -5,18 +5,56 @@
 <title>WebSocket Test</title>
 
 <script language="javascript" type="text/javascript">
+// ansi color -> html; https://github.com/mmalecki/ansispan
+var ansispan = function (str) {
+  Object.keys(ansispan.foregroundColors).forEach(function (ansi) {
+    var span = '<span style="color: ' + ansispan.foregroundColors[ansi] + '">';
+    str = str.replace(
+      new RegExp('\033\\[' + ansi + 'm', 'g'),
+      span
+    ).replace(
+      new RegExp('\033\\[1;' + ansi + 'm', 'g'),
+      span
+    );
+  });
+  return str.replace(/\033\[0m/g, '</span>');
+};
+
+ansispan.foregroundColors = {
+  '36': 'cyan',
+  '90': 'gray',
+  '92': 'mediumspringgreen',
+  '93': 'yellow',
+  '91': 'red',
+  '95': 'darkred'
+};
+
+// replace start
+var tagsToReplace = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;'
+};
+
+function replaceTag(tag) {
+    return tagsToReplace[tag] || tag;
+}
+
+function safe_tags_replace(str) {
+    return str.replace(/[&<>]/g, replaceTag);
+}
+// replace end
 
 
   function init()
   {
-	document.myform.url.value = "ws://localhost:8999/"
+	document.myform.url.value = "127.0.0.1"
 	document.myform.ws_token.value = "token_is_unset"
-	document.myform.disconnectButton.disabled = true;
   }
 
   function doConnect()
   {
-    websocket = new WebSocket(document.myform.url.value);
+    websocket = new WebSocket("ws://" + document.myform.url.value + ":8999/");
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
@@ -25,41 +63,44 @@
 
   function onOpen(evt)
   {
-    writeToScreen("connected\n");
-	document.myform.connectButton.disabled = true;
-	document.myform.disconnectButton.disabled = false;
+    writeToScreenMsg("connected");
+	document.myform.connectButton.value = "Disconnect";
 	websocket.send(document.myform.ws_token.value);
-	websocket.send("remote_log:raw");
+	websocket.send('remote_log');
   }
 
   function onClose(evt)
   {
-	writeToScreen("disconnected\n");
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
+	writeToScreenMsg("disconnected");
+	document.myform.connectButton.value = "Connect";
   }
 
   function onMessage(evt)
   {
-    writeToScreen(evt.data + '\n');
+    writeToScreenLog(evt.data);
   }
 
   function onError(evt)
   {
-	writeToScreen('error: ' + evt.data + '\n');
-
+	writeToScreenMsg('error: ' + evt.data);
 	websocket.close();
-
-	document.myform.connectButton.disabled = false;
-	document.myform.disconnectButton.disabled = true;
-
+	document.myform.connectButton.value = "Disconnect";
   }
 
+  function writeToScreenMsg(message)
+  {
+	writeToScreen('<span style="color: darkorange">' + message + '</span>');
+  }
+  
+  function writeToScreenLog(message)
+  {
+	writeToScreen(ansispan(safe_tags_replace(message)));
+  }
+  
   function writeToScreen(message)
   {
-	document.myform.outputtext.value += message
-	document.myform.outputtext.scrollTop = document.myform.outputtext.scrollHeight;
-
+	remote_log.innerHTML += message + "<br>";
+	remote_log.scrollTop = remote_log.scrollHeight;
   }
 
   window.addEventListener("load", init, false);
@@ -70,35 +111,30 @@
    }
 
   function clearText() {
-		document.myform.outputtext.value = "";
+        document.getElementById("outputtext").innerHTML = "";
    }
 
    function doDisconnect() {
 		websocket.close();
    }
+   
+   function doConnectDisconnect() {
+        (document.myform.connectButton.value == "Connect") ? doConnect() : doDisconnect()
+   }
 
 
 </script>
 
-<div id="output"></div>
-
 <form name="myform">
 <p>
-<textarea name="outputtext" rows="50" cols="120"></textarea>
-</p>
-<p>
-<input type="text" name="ws_token" size="40"></input>
-</p>
-<p>
-<input type="text" name="url" size="40"></input>
-</p>
-<p>
+token: <input type="text" name="ws_token" size="20"></input>
+ip: <input type="text" name="url" size="20"></input>
 <input type="button" name=clearButton value="Clear" onClick="clearText();">
-<input type="button" name=disconnectButton value="Disconnect" onClick="doDisconnect();">
-<input type="button" name=connectButton value="Connect" onClick="doConnect();">
+<input type="button" name=connectButton value="Connect" onClick="doConnectDisconnect();">
 </p>
-
-
 </form>
+<div id="outputtext" style="background-color: black;color: aliceblue;overflow-y: scroll;overflow-x: hidden;width: 50%;height: 400px;font-family: monospace;"></div>
+<script language="javascript" type="text/javascript">
+var remote_log = document.getElementById("outputtext");
+</script>
 </html> 
-
