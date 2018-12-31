@@ -45,13 +45,6 @@ function safe_tags_replace(str) {
 }
 // replace end
 
-
-  function init()
-  {
-	document.myform.url.value = "127.0.0.1"
-	document.myform.ws_token.value = "token_is_unset"
-  }
-
   function doConnect()
   {
     websocket = new WebSocket("ws://" + document.myform.url.value + ":8999/");
@@ -103,9 +96,6 @@ function safe_tags_replace(str) {
 	remote_log.scrollTop = remote_log.scrollHeight;
   }
 
-  window.addEventListener("load", init, false);
-
-
    function sendText() {
 		doSend( document.myform.inputtext.value );
    }
@@ -127,8 +117,8 @@ function safe_tags_replace(str) {
 
 <form name="myform">
 <p>
-token: <input type="text" name="ws_token" size="20"></input>
-ip: <input type="text" name="url" size="20"></input>
+token: <input type="text" name="ws_token" size="20" value="token_is_unset"></input>
+ip: <input type="text" name="url" size="20" value="127.0.0.1"></input>
 <input type="button" name=clearButton value="Clear" onClick="clearText();">
 <input type="button" name=connectButton value="Connect" onClick="doConnectDisconnect();">
 </p>
