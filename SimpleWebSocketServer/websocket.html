@@ -17,7 +17,7 @@ var ansispan = function (str) {
       span
     );
   });
-  return str.replace(/\033\[0m/g, '</span>');
+  return restoreURI(str.replace(/\033\[0m/g, '</span>'));
 };
 
 ansispan.foregroundColors = {
@@ -42,6 +42,9 @@ function replaceTag(tag) {
 
 function safe_tags_replace(str) {
     return str.replace(/[&<>]/g, replaceTag);
+}
+function restoreURI(str) {
+    return str.includes('<span style="color: cyan">majordomo</span>') ? decodeURI(str) : str;
 }
 // replace end
 
