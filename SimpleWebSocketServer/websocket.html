@@ -50,7 +50,7 @@ function restoreURI(str) {
 
   function doConnect()
   {
-    websocket = new WebSocket("ws://" + document.myform.url.value + ":8999/");
+    websocket = new WebSocket("ws://" + document.myform.url.value + ":7999/");
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
